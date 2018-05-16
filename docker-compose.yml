@@ -1,0 +1,35 @@
+version: '3'
+services:
+  nsqlookupd:
+    image: 192.168.1.5:5000/nsq:v1.0
+    command: /nsqlookupd
+    expose:
+      - 4160
+      - 4161
+    ports:
+      - 4160:4160
+      - 4161:4161
+  nsqd:
+    image: 192.168.1.5:5000/nsq:v1.0
+    command: /nsqd --lookupd-tcp-address=nsqlookupd:4160 --data-path=/var/nsq
+    volumes:
+          - "/var/nsq:/var/nsq"
+
+    depends_on:
+      - nsqlookupd
+    expose:
+      - 4150
+      - 4151
+    ports:
+      - 4150:4150
+      - 4151:4151
+
+  nsqadmin:
+    image: 192.168.1.5:5000/nsq:v1.0
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+    depends_on:
+      - nsqlookupd  
+    expose:
+      - 4171
+    ports:
+      - 4171:4171
